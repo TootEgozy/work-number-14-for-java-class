@@ -126,22 +126,32 @@ public class MatrixList
     }
 
     public MatrixList(int[][]mat) {
-        // _m00 = matrixToNode(mat, 0, 0);
-        
+        _m00 = matrixToNode(mat);
     }
     
     public void phase1PointerTester() {
-        int[][] m = {
-            {1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 9}
-        };
+        // int[][] m = {
+            // {1, 2, 3},
+            // {4, 5, 6},
+            // {7, 8, 9}
+        // };
         
         // int[][] m = {
             // {1},
             // {2},
             // {3}
         // };
+        
+        // int[][] m = {
+            // {1, 2, 3, 4},
+            // {5, 6, 7, 8},
+        // };
+        
+        int[][] m = {
+            {1, 2},
+            {3, 4},
+            {5, 6}
+        };
         IntNodeMat matirxHeadNode = matrixToNode(m);
     }
     
