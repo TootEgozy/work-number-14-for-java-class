@@ -17,94 +17,75 @@ public class MatrixList
         IntNodeMat upperNode = null;
     }
     
-    
-    private IntNodeMat addPointersToList(IntNodeMat tail, int colCount) {
-        boolean reverse = true;
-        if(tail.getNextCol() == null) reverse = false;
-        
-        int hop = (colCount * 2) - 1;
-        IntNodeMat currentNode = tail;
-        boolean done =  false;
-        
-        while(!done) {
-            System.out.println("priniting from the while loop in addPointers. current node is: "+ currentNode.getData());
-            if(!reverse) {
-                if(currentNode.getPrevCol() == null) {
-                    if(currentNode.getPrevRow() == null) {
-                        // we reached the end of the list. return the last node which is _m00.
-                        return currentNode;
-                    }   
-                    // we reached the end of a row. set the row pointers of the node and the one above it 
-                    // to each other and switch the direction of the row.
-                    IntNodeMat temp = currentNode;
-                    currentNode = currentNode.getPrevRow();
-                    currentNode.setNextRow(temp);
-                    reverse = !reverse;
-                    System.out.println("setting the up node "+currentNode.getData() + " to point down at this node "+temp.getData());
-                } else { // we have more nodes in the row.
-                    // add a pointer to the current node from the next one.
-                    IntNodeMat nextNode = currentNode.getPrevCol();
-                    nextNode.setNextCol(currentNode);
-                    System.out.println("setting " + nextNode.getData() + " to point to the next col: "+currentNode.getData());
-                    
-                    // this loop searches for the node above the current one.
-                    // then we set their row pointers to each other.
-                    IntNodeMat tempNextNodeUp = currentNode;
-                    for(int i = 0; i < hop; i++) {
-                        if(tempNextNodeUp.getPrevCol() != null) tempNextNodeUp = tempNextNodeUp.getPrevCol();
-                        else if (tempNextNodeUp.getPrevRow() != null) tempNextNodeUp = tempNextNodeUp.getPrevRow();
-                        else if (tempNextNodeUp.getNextCol() != null) tempNextNodeUp = tempNextNodeUp.getNextCol();
-                        else tempNextNodeUp = null;
-                    }
-                    if(tempNextNodeUp != null) {
-                        currentNode.setPrevRow(tempNextNodeUp);
-                        tempNextNodeUp.setNextRow(currentNode);
-                        System.out.println("setting " + currentNode.getData() + " to point up to " + tempNextNodeUp.getData());
-                        System.out.println("setting " + tempNextNodeUp.getData() + " to point down to " + currentNode.getData());
-                    }
-                    currentNode = currentNode.getPrevCol();
-                }
-                
+    private void setUpperPointer(IntNodeMat node, int hop, boolean reverse) {
+        IntNodeMat tempNode = node;
+        boolean isReversed = reverse;
+        // go up the list and look for the node above node using hop to set their up / down pointers at each other.
+        // if there is no node above (last row) do nothing.
+        for(int i = 0; i < hop; i++) {
+            if(isReversed) {
+                if(tempNode.getPrevCol() != null) tempNode = tempNode.getPrevCol(); // move left until the end of the row.
+                else if(tempNode.getPrevRow() != null) {
+                    tempNode = tempNode.getPrevRow();
+                    isReversed = !isReversed;
+                } else return; // if there is no upper row exit the function.
             } else {
-                if(currentNode.getNextCol() == null) {
-                    if(currentNode.getPrevRow() == null) {
-                        // we reached the end of the list. return the last node which is _m00.
-                        return currentNode;
-                    }
-                    // we reached the end of a row. set the row pointers of the node and the one above it 
-                    // to each other and switch the direction of the row.
-                    IntNodeMat temp = currentNode;
-                    currentNode = currentNode.getPrevRow();
-                    currentNode.setNextRow(temp);
-                    reverse = !reverse;
-                    System.out.println("setting the up node "+currentNode.getData() + " to point down at this node "+temp.getData());
-                } else { // we have more nodes in the row.
-                    // add a pointer to the current node from the next one.
-                    IntNodeMat nextNode = currentNode.getNextCol();
-                    nextNode.setPrevCol(currentNode);
-                    System.out.println("setting " + nextNode.getData() + " to point to the prev col: "+currentNode.getData());
-                    
-                    // this loop searches for the node above the current one.
-                    // then we set their row pointers to each other.
-                    IntNodeMat tempNextNodeUp = currentNode;
-                    for(int i = 0; i < hop; i++) {
-                        if(tempNextNodeUp.getNextCol() != null) tempNextNodeUp = tempNextNodeUp.getNextCol();
-                        else if (tempNextNodeUp.getPrevRow() != null) tempNextNodeUp = tempNextNodeUp.getPrevRow();
-                        else if (tempNextNodeUp.getPrevCol() != null) tempNextNodeUp = tempNextNodeUp.getPrevCol();
-                        else tempNextNodeUp = null;
-                    }
-                    if(tempNextNodeUp != null) {
-                        currentNode.setPrevRow(tempNextNodeUp);
-                        tempNextNodeUp.setNextRow(currentNode);
-                        System.out.println("setting " + currentNode.getData() + " to point up to " + tempNextNodeUp.getData());
-                        System.out.println("setting " + tempNextNodeUp.getData() + " to point down to " + currentNode.getData());
-                    }
-                    currentNode = currentNode.getNextCol();
-                }
+                if(tempNode.getNextCol() != null) tempNode = tempNode.getNextCol(); // move left until the end of the row.
+                else if(tempNode.getPrevRow() != null) {
+                    tempNode = tempNode.getPrevRow();
+                    isReversed = !isReversed;
+                } else return; // if there is no upper row exit the function.                
             }
         }
+        // we reached the end of the loop so tempNode is the node above node. 
+        // set their up / down pointers to each other.
+        node.setPrevRow(tempNode);
+        tempNode.setNextRow(node);
         
+        // ^ this was the end, following is debug:
+        int nodeValue = node.getData();
+        int tempNodeValue = tempNode.getData();
+        System.out.println("setting up and down pointers from setUpperPointer: ");
+        System.out.println(nodeValue +" up to: "+tempNodeValue);
+    }
+    
+    
+    private IntNodeMat addPointersToList(IntNodeMat tail, int colCount, int matLength) {
+        boolean reverse = true;
+        if(tail.getPrevCol() == null) reverse = false;
         
+        int hop = (colCount * 2) - 1;
+        IntNodeMat node = tail;
+        IntNodeMat temp = node;
+        int counter = 0; // safty for the while loop to avoid endless looping in case of a bug. 
+        
+        while(counter < matLength) {
+            System.out.println("node is: "+node.getData());
+            if((reverse && node.getPrevCol() == null) || (!reverse && node.getNextCol() == null )) {// node is the last of the row
+                if(node.getPrevRow() == null) return node; // node is also the end of the list so return it.
+                // node is the last of the row and there's a row above it. 
+                // set the pointer of the node above it to point down to it, and reset the variables to start a new row.
+                temp = node;
+                node = node.getPrevRow();
+                node.setNextRow(temp);
+                reverse = !reverse;
+                hop = (colCount * 2) -1;
+            } else { // continue on the same row
+                setUpperPointer(node, hop, reverse);
+                hop = hop - 2;
+                if(reverse) {
+                    temp = node;
+                    node = node.getPrevCol();
+                    node.setNextCol(temp);                    
+                } else { // direction is right
+                    temp = node;
+                    node = node.getNextCol();
+                    node.setPrevCol(temp);                    
+                }
+                
+            }
+            counter++;
+        }
         return null;
     }
     
@@ -140,7 +121,7 @@ public class MatrixList
             
         }
         System.out.println("Finished creating the list, now adding pointers:");
-        IntNodeMat head = addPointersToList(prevNode, colCount);
+        IntNodeMat head = addPointersToList(prevNode, colCount, rowCount * colCount);
         return head;
     }
 
