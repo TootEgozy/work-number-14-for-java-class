@@ -13,24 +13,102 @@ public class MatrixList
         _m00 = null;
     }
     
+    private void connectUpDownPointers(IntNodeMat node, int hop) {
+        IntNodeMat upperNode = null;
+    }
     
-    private IntNodeMat matrixToNode(int[][] m) {
-        // // check if we are out of bounds, and if so return null
-        // if(row < 0 || row > (m.length - 1) || col < 0 || col > (m[0].length - 1)) {
-            // return null;   
-        // }
+    
+    private IntNodeMat addPointersToList(IntNodeMat tail, int colCount) {
+        boolean reverse = true;
+        if(tail.getNextCol() == null) reverse = false;
         
-        // // if we are in bounds create a new node
-        // IntNodeMat node = new IntNodeMat(m[row][col]);
+        int hop = (colCount * 2) - 1;
+        IntNodeMat currentNode = tail;
+        boolean done =  false;
         
-        // node.setNextRow(matrixToNode(m, row + 1, col));
-        // node.setNextCol(matrixToNode(m, row, col + 1));
-        // node.setPrevRow(matrixToNode(m, row - 1, col));
-        // node.setPrevCol(matrixToNode(m, row, col - 1));
+        while(!done) {
+            System.out.println("priniting from the while loop in addPointers. current node is: "+ currentNode.getData());
+            if(!reverse) {
+                if(currentNode.getPrevCol() == null) {
+                    if(currentNode.getPrevRow() == null) {
+                        // we reached the end of the list. return the last node which is _m00.
+                        return currentNode;
+                    }   
+                    // we reached the end of a row. set the row pointers of the node and the one above it 
+                    // to each other and switch the direction of the row.
+                    IntNodeMat temp = currentNode;
+                    currentNode = currentNode.getPrevRow();
+                    currentNode.setNextRow(temp);
+                    reverse = !reverse;
+                    System.out.println("setting the up node "+currentNode.getData() + " to point down at this node "+temp.getData());
+                } else { // we have more nodes in the row.
+                    // add a pointer to the current node from the next one.
+                    IntNodeMat nextNode = currentNode.getPrevCol();
+                    nextNode.setNextCol(currentNode);
+                    System.out.println("setting " + nextNode.getData() + " to point to the next col: "+currentNode.getData());
+                    
+                    // this loop searches for the node above the current one.
+                    // then we set their row pointers to each other.
+                    IntNodeMat tempNextNodeUp = currentNode;
+                    for(int i = 0; i < hop; i++) {
+                        if(tempNextNodeUp.getPrevCol() != null) tempNextNodeUp = tempNextNodeUp.getPrevCol();
+                        else if (tempNextNodeUp.getPrevRow() != null) tempNextNodeUp = tempNextNodeUp.getPrevRow();
+                        else if (tempNextNodeUp.getNextCol() != null) tempNextNodeUp = tempNextNodeUp.getNextCol();
+                        else tempNextNodeUp = null;
+                    }
+                    if(tempNextNodeUp != null) {
+                        currentNode.setPrevRow(tempNextNodeUp);
+                        tempNextNodeUp.setNextRow(currentNode);
+                        System.out.println("setting " + currentNode.getData() + " to point up to " + tempNextNodeUp.getData());
+                        System.out.println("setting " + tempNextNodeUp.getData() + " to point down to " + currentNode.getData());
+                    }
+                    currentNode = currentNode.getPrevCol();
+                }
+                
+            } else {
+                if(currentNode.getNextCol() == null) {
+                    if(currentNode.getPrevRow() == null) {
+                        // we reached the end of the list. return the last node which is _m00.
+                        return currentNode;
+                    }
+                    // we reached the end of a row. set the row pointers of the node and the one above it 
+                    // to each other and switch the direction of the row.
+                    IntNodeMat temp = currentNode;
+                    currentNode = currentNode.getPrevRow();
+                    currentNode.setNextRow(temp);
+                    reverse = !reverse;
+                    System.out.println("setting the up node "+currentNode.getData() + " to point down at this node "+temp.getData());
+                } else { // we have more nodes in the row.
+                    // add a pointer to the current node from the next one.
+                    IntNodeMat nextNode = currentNode.getNextCol();
+                    nextNode.setPrevCol(currentNode);
+                    System.out.println("setting " + nextNode.getData() + " to point to the prev col: "+currentNode.getData());
+                    
+                    // this loop searches for the node above the current one.
+                    // then we set their row pointers to each other.
+                    IntNodeMat tempNextNodeUp = currentNode;
+                    for(int i = 0; i < hop; i++) {
+                        if(tempNextNodeUp.getNextCol() != null) tempNextNodeUp = tempNextNodeUp.getNextCol();
+                        else if (tempNextNodeUp.getPrevRow() != null) tempNextNodeUp = tempNextNodeUp.getPrevRow();
+                        else if (tempNextNodeUp.getPrevCol() != null) tempNextNodeUp = tempNextNodeUp.getPrevCol();
+                        else tempNextNodeUp = null;
+                    }
+                    if(tempNextNodeUp != null) {
+                        currentNode.setPrevRow(tempNextNodeUp);
+                        tempNextNodeUp.setNextRow(currentNode);
+                        System.out.println("setting " + currentNode.getData() + " to point up to " + tempNextNodeUp.getData());
+                        System.out.println("setting " + tempNextNodeUp.getData() + " to point down to " + currentNode.getData());
+                    }
+                    currentNode = currentNode.getNextCol();
+                }
+            }
+        }
         
-        // return node;
         
-        
+        return null;
+    }
+    
+    private IntNodeMat matrixToNode(int[][] m) {     
         IntNodeMat prevNode = null;
         int prevRowCount = 1;
         boolean reverse = false;
@@ -42,12 +120,9 @@ public class MatrixList
             if(reverse) {
                 for(int j = colCount - 1; j >= 0; j--) {
                     IntNodeMat newNode = new IntNodeMat(m[j][i]); 
-                    System.out.println(newNode.getData());
-                    if(j == colCount - 1) {
-                        newNode.setPrevRow(prevNode);    
-                    } else {
-                        newNode.setNextCol(prevNode);
-                    }
+                    if(j == colCount - 1) newNode.setPrevRow(prevNode);    
+                    else newNode.setNextCol(prevNode);
+                    
                     if(j == 0) reverse = !reverse;
                     prevNode = newNode;
                 }
@@ -55,19 +130,18 @@ public class MatrixList
             } else {
                     for(int j = 0; j < colCount; j++ ) {
                     IntNodeMat newNode = new IntNodeMat(m[j][i]); 
-                    System.out.println(newNode.getData());
-                    if(j == 0) {
-                        newNode.setPrevRow(prevNode);    
-                    } else {
-                        newNode.setPrevCol(prevNode);
-                    }
+                    if(j == 0) newNode.setPrevRow(prevNode);    
+                    else newNode.setPrevCol(prevNode);
+
                     if(j == colCount - 1) reverse = !reverse;
                     prevNode = newNode;
                 }
             }
+            
         }
-        
-        return prevNode;
+        System.out.println("Finished creating the list, now adding pointers:");
+        IntNodeMat head = addPointersToList(prevNode, colCount);
+        return head;
     }
 
     public MatrixList(int[][]mat) {
@@ -75,15 +149,19 @@ public class MatrixList
         
     }
     
-    public void tester() {
+    public void phase1PointerTester() {
         int[][] m = {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9}
         };
+        
+        // int[][] m = {
+            // {1},
+            // {2},
+            // {3}
+        // };
         IntNodeMat matirxHeadNode = matrixToNode(m);
-        System.out.println("done creating the matrix");
-        printList(matirxHeadNode);
     }
     
 
