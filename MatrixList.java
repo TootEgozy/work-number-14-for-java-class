@@ -1,9 +1,7 @@
 
 /**
- * Write a description of class MatrixList here.
- *
- * @author (your name)
- * @version (a version number or a date)
+ Toot Egozy 313384612
+ קיבלתי אישור להגיש את הממ"ן באיחור, אשמח להתחשבות בכך, תודה רבה 
  */
 public class MatrixList
 {
@@ -91,13 +89,24 @@ public class MatrixList
         return null;
     }
     
+    private boolean isMatrixEmpty(int[][] m) {
+        if(m == null || m.length == 0 || m[0].length == 0) return true;
+        return false;
+    }
+    
     // a helper method to create a node matrix from 2D array.
     // this method constructs a zigzag linked list, and the calles addPointersToList to add more pointers
     // to the nodes and "fold" the list into a matrix.
     // it returns the head node of the matrix.
-    private IntNodeMat matrixToNode(int[][] m) {     
+    private IntNodeMat matrixToNode(int[][] m) {
+        
+        // ****************** IMPORTANT ******************
+        // * find out wht to return if matrix is empty *
+        // ***********************************************
+        if(isMatrixEmpty(m)) return new IntNodeMat(0);
+        
         IntNodeMat prevNode = null;
-        // int prevRowCount = 1; ///////////////////////////////////////////////////////////!!!! delete this
+        
         // we start with the direction left to right.
         boolean reverse = false;
         
@@ -143,88 +152,205 @@ public class MatrixList
 
     }
     
-    public void phase1PointerTester() {
-        // int[][] m = {
-            // {1, 2, 3},
-            // {4, 5, 6},
-            // {7, 8, 9}
-        // };
+    private IntNodeMat makeMatrix() {
+        IntNodeMat node1 = new IntNodeMat(1);
+        IntNodeMat node2 = new IntNodeMat(2);
         
-        // int[][] m = {
-            // {1},
-            // {2},
-            // {3}
-        // };
+        IntNodeMat node3 = new IntNodeMat(3);
+        IntNodeMat node4 = new IntNodeMat(4);
         
-        // int[][] m = {
-            // {1, 2, 3, 4},
-            // {5, 6, 7, 8},
-        // };
+        IntNodeMat node5 = new IntNodeMat(5);
+        IntNodeMat node6 = new IntNodeMat(6);
         
-        int[][] m = {
+        node1.setNextCol(node3);
+        node1.setNextRow(node2);
+        
+        node2.setPrevRow(node1);
+        node2.setNextCol(node4);
+        
+        node3.setPrevCol(node1);
+        node3.setNextRow(node4);
+        node3.setNextCol(node5);
+        
+        node4.setPrevCol(node2);
+        node4.setPrevRow(node3);
+        node4.setNextCol(node6);
+        
+        node5.setPrevCol(node3);
+        node5.setNextRow(node6);
+        
+        node6.setPrevCol(node4);
+        node6.setPrevRow(node5);
+        
+        return node1;
+    };
+    
+    public void testPrint() {
+        int[][] m1 = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        
+        int[][] m2 = {
+            {1},
+            {2},
+            {3}
+        };
+        
+        int[][] m3 = {
+            {1, 2, 3}
+        };
+        int[][] m4 = {
+            {1, 2, 3, 4},
+            {5, 6, 7, 8},
+        };
+        
+        int[][] m5 = {
             {1, 2},
             {3, 4},
             {5, 6}
         };
-        IntNodeMat matirxHeadNode = matrixToNode(m);
-    }
-    
-
-    public int getData_i_j (int i, int j) {
-        return 0;
-    }
-
-    public void setData_i_j (int data, int i, int j) {
-
-    }
-    
-    private void printList(IntNodeMat headNode) {
         
-        IntNodeMat node = headNode;
-        String direction = "L";
-        while (node != null) {
-            System.out.println(node.getData());
-            if(direction == "L") {
-                if(node.getPrevCol() != null) node = node.getPrevCol();
-                else if(node.getPrevRow() != null) {
-                    node = node.getPrevRow();
-                    direction = "R";
-                }
-                else node = null;
-            } else {
-                if(node.getNextCol() != null) node = node.getNextCol();
-                else if(node.getPrevRow() != null) {
-                    node = node.getPrevRow();
-                    direction = "L";
-                }
-                else node = null;   
-            }
+        int[][] m6 = {{}};
+        
+        IntNodeMat node1 = matrixToNode(m1);
+        IntNodeMat node2 = matrixToNode(m2);
+        IntNodeMat node3 = matrixToNode(m3);
+        IntNodeMat node4 = matrixToNode(m4);
+        IntNodeMat node5 = matrixToNode(m5);
+        IntNodeMat node6 = matrixToNode(m6);
+        
+        String str1 = stringify(node1, "R");
+        System.out.println(str1);
+        
+        String str2 = stringify(node2, "R");
+        System.out.println(str2);
+        
+        String str3 = stringify(node3, "R");
+        System.out.println(str3);
+        
+        String str4 = stringify(node4, "R");
+        System.out.println(str4);
+        
+        String str5 = stringify(node5, "R");
+        System.out.println(str5);
+        
+        String str6 = stringify(node6, "R");
+        System.out.println(str6);
+        
+    }
+    
+    public void testSetGetIndex() {
+        int[][] m1 = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        
+        int[][] m2 = {
+            {1},
+            {2},
+            {3}
+        };
+        
+        int[][] m3 = {
+            {1, 2, 3}
+        };
+        int[][] m4 = {
+            {1, 2, 3, 4},
+            {5, 6, 7, 8},
+        };
+        
+        int[][] m5 = {
+            {1, 2},
+            {3, 4},
+            {5, 6}
+        };
+        
+        int[][] m6 = {{}};
+        
+        MatrixList mn2 = new MatrixList(m2);
+        System.out.println(mn2.getData_i_j(0, 1));
+        
+    }
+    
+    
+    // a helper method to find a node in the matrix from row and column indexes.
+    // the method starts with the head of the matrix, uses a loop which repeats i times 
+    // to move down the rows of the matrix, and another loop which repeats j times to move to the j node.
+    // each iteration assigns the new node to the variable tempNode.
+    // when the 2 loops are finished tempNode should be the i, j node, and the method returns it.
+    // if we got an invalid index, the method returns null. 
+    private IntNodeMat findNodeFromIndexes(int i, int j) {
+        IntNodeMat tempNode = _m00;
+        
+        for(int row = 0; row < i; row ++) {
+            if(tempNode.getNextRow() != null) tempNode = tempNode.getNextRow();
+            else return null;
+        }
+        
+        for(int col = 0; col < j; col++) {
+            if(tempNode.getNextCol() != null) tempNode = tempNode.getNextCol();
+            else return null;
+        }
+        
+        return tempNode;
+    }
+    
+    
+    // a method which receives the row index i and column index j and returns 
+    // the data of the [i][j] node in the matrix. if the index is invalid, 
+    // the method returns the minimal value of integer.
+    // this method calls the helper method findNodeFromIndexes,which returns the node if found or null if not. 
+    public int getData_i_j (int i, int j) {
+        IntNodeMat node = findNodeFromIndexes(i, j);
+        
+        if(node == null) return Integer.MIN_VALUE;
+               
+        return node.getData();
+    }
+    
+    
+    // a method which receives the row index i, the column index j and a number, and sets 
+    // the number as the data of the [i][j] node in the matrix.
+    // this method uses the helper method findNodeFromIndexes, and if a node is returned from it it's dta is set.
+    // if findNodeFromIndexes returns null, which means that the indexes are invalid, the method does nothing.
+    public void setData_i_j (int data, int i, int j) {
+        IntNodeMat node = findNodeFromIndexes(i, j);
+        
+        if(node != null) node.setData(data);
+    }
+    
+    // a recursive helper function to create the string to print the matrix.
+    // start from the head node and go right using the direction flag and the method getNextCol() of node, 
+    // creacte a string from the nodes data and tab chars for the row.
+    // once the end of the row is reached, a newline char is returned, and the direction flag is flipped.
+    // the next calls for the recursion traverse to the left of the new row without adding chars,
+    // until the beginning of the row is reached. 
+    // then the direction flag switches to right and the method goes over the row to add the data and tab chars.
+    // this method returns the compelete string which represents the matrix.
+    private String stringify(IntNodeMat node, String direction) {
+        if(node == null) return "";
+        else if (direction == "R") { // direction is left to right, compile the node data and tab chars.
+            if (node.getNextCol() != null) return node.getData() + "\t" + stringify(node.getNextCol(), "R");
+            else if(node.getNextRow() != null) return node.getData() + "\n" + stringify(node.getNextRow(), "L");
+            else return node.getData() + "\n";
+        } else { // direction is right to left, move to the beginning of the row.
+            if(node.getPrevCol() != null) return stringify(node.getPrevCol(), "L");
+            else if(node.getNextCol() != null) return node.getData() + "\t" + stringify(node.getNextCol(), "R");
+            else if(node.getNextRow() != null) return node.getData() + "\n" + stringify(node.getNextRow(), "L");
+            else return node.getData() + "\n";
         }
     }
     
-    // a recursive function to create the string to print the matrix.
-    // we are zigzaging down the matrix, starting from the top left node, and progressing on the row 
-    // using the direction flag - "R" to continue right and "L" for left. 
-    // when we reached the end of the row, we go down a row and flip the direction, until the end is reached and a string is returned.
-    // each recursion returns the value of the node along with a seperating character - tab or newline.
-    // please notice that I hard-coded the direction flag "L" or "R" intentionally, instead of passing the parameter, 
-    // because in my opinion it improves the code readability. 
-    private String stringify(IntNodeMat node, String direction) {
-        if (direction == "R") {
-            if(node.getNextRow() != null) return node.getData() + "\t" + stringify(node.getNextRow(), "R");
-            else if (node.getNextCol() != null) return node.getData() + "\n" + stringify(node.getNextCol(), "L");
-            else return node.getData() + "\n";
-        } else { // direction is "L"
-            if(node.getPrevRow() != null) return node.getData() + "\t" + stringify(node.getPrevRow(), "L");
-            else if (node.getNextCol() != null) return node.getData() + "\n" + stringify(node.getNextCol(), "R");
-            else return node.getData() + "\n";
-        }
+    public void printToString() {
+        System.out.print(stringify(_m00, "R"));
     }
 
-
+    // return the string repersentation of the node matrix, using tab and newline chars as seperators.
     public String toString() {
-        System.out.print(stringify(_m00, "R"));
-        return null;
+        return stringify(_m00, "R");
     }
 
     public int findMax() {
