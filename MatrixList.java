@@ -352,9 +352,25 @@ public class MatrixList
     public String toString() {
         return stringify(_m00, "R");
     }
+    
+    private int findMax(IntNodeMat node, String direction, int max) {
+        if(direction == "R") {
+            if(node.getNextCol() != null) return findMax(node.getNextCol(), "R", Math.max(max, node.getData()));
+            else if(node.getNextRow() != null) return findMax(node.getNextRow(), "L", Math.max(max, node.getData()));
+            else return Math.max(max, node.getData());
+        } else { // direction is L
+            if(node.getPrevCol() != null) return findMax(node.getPrevCol(), "L", Math.max(max, node.getData()));
+            else if(node.getNextRow() != null) return findMax(node.getNextRow(), "R", Math.max(max, node.getData()));
+            else return Math.max(max, node.getData());
+        }
+    }
 
     public int findMax() {
-        return 0;
+        // if(_m00.getData() != null) 
+        return findMax(_m00, "R", _m00.getData()); 
+        
+        // else return Integer.MIN_VALUE;
+        
     }
 
     public int howManyX(int x) {
