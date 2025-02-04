@@ -6,7 +6,7 @@
 public class MatrixList
 {
     IntNodeMat _m00;
-
+ 
     public MatrixList() {
         _m00 = null;
     }
@@ -304,9 +304,9 @@ public class MatrixList
     // the method returns the minimal value of integer.
     // this method calls the helper method findNodeFromIndexes,which returns the node if found or null if not. 
     public int getData_i_j (int i, int j) {
-        IntNodeMat node = findNodeFromIndexes(i, j);
+        if(_m00 == null) return Integer.MIN_VALUE;
         
-        if(node == null) return Integer.MIN_VALUE;
+        IntNodeMat node = findNodeFromIndexes(i, j);
                
         return node.getData();
     }
@@ -317,6 +317,8 @@ public class MatrixList
     // this method uses the helper method findNodeFromIndexes, and if a node is returned from it it's dta is set.
     // if findNodeFromIndexes returns null, which means that the indexes are invalid, the method does nothing.
     public void setData_i_j (int data, int i, int j) {
+        if(_m00 == null) return;
+        
         IntNodeMat node = findNodeFromIndexes(i, j);
         
         if(node != null) node.setData(data);
@@ -366,15 +368,38 @@ public class MatrixList
     }
 
     public int findMax() {
-        // if(_m00.getData() != null) 
+        if(_m00 == null) return Integer.MIN_VALUE;
+         
         return findMax(_m00, "R", _m00.getData()); 
         
-        // else return Integer.MIN_VALUE;
+    }
+    
+    private int countX(IntNodeMat node, String direction, int x, int sum) {
+        if(node == null) return 0;
         
+        if(node.getData() == x) return sum + 1;
+        else if (node.getData() > x) return sum;
+        
+        else if (direction == "R") {
+            if(node.getNextCol() != null) {
+                   if(node.getNextRow() != null) {
+                       return(countX(node.getNextCol(), "R", x, sum) + countX(node.getNextRow(), "D", x, sum));
+                   }
+                   else return countX(node.getNextCol(), "R", x, sum);
+            } else if(node.getNextRow() != null) return countX(node.getNextRow(), "D", x, sum);    
+            else return sum;
+        } else { // direction is "D"
+            if(node.getNextRow() != null) return countX(node.getNextRow(), "D", x, sum);
+            else return sum;
+        }
     }
 
     public int howManyX(int x) {
-        return 0;
+        return countX(_m00, "R", x, 0);
+    }
+    
+    public void printHowMany(int x) {
+        System.out.println(howManyX(x));
     }
 
 }
